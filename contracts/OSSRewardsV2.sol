@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title OSSRewardsV2 - Improved OSS Contribution Rewards System
- * @dev Startup-ready platform with sustainable economics and anti-manipulation
+ * @dev a platform with sustainable economics and anti-manipulation.
  */
 contract OSSRewardsV2 is Ownable, ReentrancyGuard, Pausable {
     IERC20 public immutable ossToken;
