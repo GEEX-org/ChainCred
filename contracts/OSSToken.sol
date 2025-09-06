@@ -17,7 +17,7 @@ contract OSSToken is ERC20, Ownable, Pausable {
     
     event MinterAdded(address indexed minter);
     event MinterRemoved(address indexed minter);
-    
+
     modifier onlyMinter() {
         require(minters[msg.sender] || msg.sender == owner(), "Not authorized to mint");
         _;
@@ -66,10 +66,20 @@ contract OSSToken is ERC20, Ownable, Pausable {
     }
     
     /**
-     * @dev Unpause the contract
+     * @dev
      */
     function unpause() external onlyOwner {
         _unpause();
     }
     
+    /**
+     * @dev Override transfer to respect pause state
+     */
+    function _update(address from, address to, uint256 value) 
+        internal 
+        override 
+        whenNotPaused 
+    {
+        super._update(from, to, value);
+    }
 } 
