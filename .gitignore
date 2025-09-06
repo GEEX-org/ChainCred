@@ -1,20 +1,66 @@
-# Node modules
-/node_modules
+# IntelliJ IDEA files
+*.iml
+.idea/
+.idea/*
 
-# Compilation output
-/dist
+# macOS specific files
+.DS_Store
 
-# pnpm deploy output
-/bundle
+# Git directory
+.git/
 
-# Hardhat Build Artifacts
-/artifacts
+# Visual Studio files
+.vs/
+.vscode/
 
-# Hardhat compilation (v2) support directory
-/cache
+# Log files
+*.log
 
-# Typechain output
-/types
+# Temporary files
+*.tmp
+*.temp
 
-# Hardhat coverage reports
-/coverage
+# Node.js dependencies
+node_modules/
+
+# Python compiled files
+__pycache__/
+*.py[cod]
+
+# Coverage reports
+coverage/
+*.cover
+*.coverage
+*.coveragerc
+
+# Build directories
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Compiled binary files
+*.out
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Backup files
+*.bak
+*.swp
+*~
+
+# Package-lock and yarn files
+package-lock.json
+yarn.lock
+
+# GitHub specific directories
+.github/
+
+artifacts
+cache
+.env

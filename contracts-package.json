@@ -1,0 +1,32 @@
+{
+  "name": "OSSIUM",
+  "version": "1.0.0",
+  "description": "Smart contracts for open Source program",
+  "main": "hardhat.config.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:local": "hardhat run scripts/deploy.js --network hardhat",
+    "deploy:holesky": "hardhat run scripts/deploy.js --network holesky",
+    "verify:holesky": "hardhat verify --network holesky",
+    "node": "hardhat node",
+    "clean": "hardhat clean"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0",
+    "dotenv": "^16.3.1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  },
+  "keywords": [
+    "ethereum",
+    "smart-contracts",
+    "dao",
+    "defi",
+    "holesky"
+  ],
+  "author": "OSSIUM TEAM",
+  "license": "MIT"
+} 
