@@ -1,7 +1,7 @@
 {
-  "name": "OSSIUM",
+  "name": "hardcoded",
   "version": "1.0.0",
-  "description": "Smart contracts for open Source program",
+  "description": "Smart contracts for open Source Rewards (OSS) platform",
   "main": "hardhat.config.js",
   "scripts": {
     "compile": "hardhat compile",
@@ -27,6 +27,6 @@
     "defi",
     "holesky"
   ],
-  "author": "OSSIUM TEAM",
+  "author": "hardcoded",
   "license": "MIT"
 } 
