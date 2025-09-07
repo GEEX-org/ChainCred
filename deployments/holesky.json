@@ -2,22 +2,22 @@
   "network": "holesky",
   "chainId": 17000,
   "deployer": "0x4C20760bf69f8d6f4A36F94fA4B0e5B35A4C7540",
-  "timestamp": "2025-09-07T03:01:09.431Z",
+  "timestamp": "2025-09-07T04:27:42.831Z",
   "contracts": {
     "OSSToken": {
-      "address": "0x200087ffDc5A727884aCCC3435560c4B39901dF2",
+      "address": "0xdD76ec0B944AE863137C9C3a50EC075d5355A0F5",
       "name": "Open Source Rewards",
       "symbol": "OSS",
-      "deploymentBlock": 4467575
+      "deploymentBlock": 4467915
     },
     "OSSRewards": {
-      "address": "0xBA7b49B8De3831c7943969e9F74550e283137438",
-      "deploymentBlock": 4467577
+      "address": "0xA1a4F42E48aE20800C366c09B4fb94c6f9f106e7",
+      "deploymentBlock": 4467917
     }
   },
   "transactions": {
-    "tokenDeploy": "0x372c7f41fd233bb11ad497f33f40ef22fe4084bde23c345f259014b3235247a6",
-    "rewardsDeploy": "0xec485fdcba394b704d3a53e8b919519b2c35461338c6c01f4bffa6413c16a6ef",
-    "addMinter": "0x3c08786d5dda898c737f297e0cec114bc2dbe4803781bd478a72c07707719386"
+    "tokenDeploy": "0x22b4ba972b61f359f5552a1e89f76f660172878b0d92fa5b1f228e20ff40b267",
+    "rewardsDeploy": "0x0f1be44015acad7963ea85e57541675e0c99778f3dcf80bfce365f5c938d8426",
+    "addMinter": "0x4df0e647ba79daafb11f2ed1d2eef85513d19a3ec3a720277c3cb404b8a7830e"
   }
 }

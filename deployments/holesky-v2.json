@@ -13,11 +13,6 @@
       "address": "0x3B43569CD582223225b8BB645B809bc535A93633",
       "txHash": "0x7ac47b1488a1afd46591b83e639b4f196f70c9b0b8d87dacc4f1dccb6e8bfb64",
       "blockNumber": 4078387
-    },
-    "OSSDAO": {
-      "address": "0x09cb31B885e798Df81859eBa0202B22FA1F85eC7",
-      "txHash": "0x48fd441963bbb6057322a17765c5b3330766014526352a8e8fe98a0c4d873b9b",
-      "blockNumber": 4078390
     }
   }
 }
