@@ -212,8 +212,8 @@ npm run start
 ## 🔮 Future Scope
 
 ### **Multi-Chain Expansion**
-- Deploy on Ethereum mainnet, Polygon, and other EVM chains
-- Cross-chain contribution tracking and reward distribution
+- Deploy on Ethereum test like holensky, sepolia other testnets.
+- Contribution tracking and reward distribution
 
 
 ### **Advanced Features**
@@ -231,7 +231,11 @@ npm run start
 
 **Team hardCoded** - Blockchain and Web3 enthusiasts dedicated to revolutionizing open-source sustainability.
 
-*Team member details and contributions will be added here*
+- Ishan Tiwari
+- Kunal Kumar
+- Ishan Arya
+- Ritusree chanda
+- Annupurna gupta
 
 ---
 
