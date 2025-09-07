@@ -1,7 +1,7 @@
 {
-  "name": "hardcoded",
+  "name": "ChainCred",
   "version": "1.0.0",
-  "description": "Smart contracts for open Source Rewards (OSS) platform",
+  "description": "Smart contracts for open Source program",
   "main": "hardhat.config.js",
   "scripts": {
     "compile": "hardhat compile",
@@ -27,6 +27,6 @@
     "defi",
     "holesky"
   ],
-  "author": "hardcoded",
+  "author": "CHAINCRED TEAM",
   "license": "MIT"
 } 

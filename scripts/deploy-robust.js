@@ -2,20 +2,22 @@ const { ethers } = require("hardhat");
 const fs = require("fs");
 const path = require("path");
 
-// Helper function to wait for transaction with retries
+// Helper: wait for transaction confirmation with retries
 async function waitForTransactionWithRetries(provider, txHash, maxRetries = 10, delay = 10000) {
   for (let i = 0; i < maxRetries; i++) {
     try {
-      console.log(`⏳ Waiting for transaction ${txHash} (attempt ${i + 1}/${maxRetries})...`);
+      console.log(`⏳ [${i + 1}/${maxRetries}] Waiting for tx: ${txHash}`);
       const receipt = await provider.getTransactionReceipt(txHash);
+
       if (receipt) {
-        console.log(`✅ Transaction confirmed in block ${receipt.blockNumber}`);
+        console.log(`   ✅ Confirmed in block ${receipt.blockNumber}`);
         return receipt;
       }
-      console.log(`⏳ Transaction not yet mined, waiting ${delay/1000}s...`);
+
+      console.log(`   ⏳ Still pending... retry in ${delay / 1000}s`);
       await new Promise(resolve => setTimeout(resolve, delay));
     } catch (error) {
-      console.log(`⚠️ Error checking transaction (attempt ${i + 1}): ${error.message}`);
+      console.log(`   ⚠️ Error (attempt ${i + 1}): ${error.message}`);
       if (i === maxRetries - 1) throw error;
       await new Promise(resolve => setTimeout(resolve, delay));
     }
@@ -23,35 +25,32 @@ async function waitForTransactionWithRetries(provider, txHash, maxRetries = 10, 
   throw new Error(`Transaction ${txHash} not confirmed after ${maxRetries} attempts`);
 }
 
-// Helper function to deploy contract with manual confirmation
+// Helper: deploy contract with manual confirmation
 async function deployContractRobust(contractFactory, args = [], contractName = "Contract") {
-  console.log(`\n📦 Deploying ${contractName}...`);
-  
-  // Deploy the contract
+  console.log(`\n🚀 Deploying: ${contractName}`);
+
   const contract = await contractFactory.deploy(...args);
-  console.log(`📝 ${contractName} deployment transaction sent: ${contract.deploymentTransaction().hash}`);
-  
-  // Wait for transaction confirmation manually
+  console.log(`   ↳ Tx Hash : ${contract.deploymentTransaction().hash}`);
+
   const receipt = await waitForTransactionWithRetries(
-    contract.runner.provider, 
+    contract.runner.provider,
     contract.deploymentTransaction().hash
   );
-  
-  // Get the contract address
+
   const address = await contract.getAddress();
-  console.log(`✅ ${contractName} deployed to: ${address}`);
-  
+  console.log(`   ✅ Address: ${address}`);
+
   return { contract, address, receipt };
 }
 
 async function main() {
-  console.log("🚀 Starting robust deployment to", network.name);
-  
+  console.log("🌐 Starting deployment →", network.name);
+
   const [deployer] = await ethers.getSigners();
-  console.log("📝 Deploying contracts with account:", deployer.address);
-  
+  console.log("👤 Deployer:", deployer.address);
+
   const balance = await deployer.provider.getBalance(deployer.address);
-  console.log("💰 Account balance:", ethers.formatEther(balance), "ETH");
+  console.log("💰 Balance :", ethers.formatEther(balance), "ETH");
 
   let deploymentResults = {};
 
@@ -66,30 +65,28 @@ async function main() {
     const rewardsResult = await deployContractRobust(OSSRewards, [tokenResult.address], "OSS Rewards");
     deploymentResults.rewards = rewardsResult;
 
-    // Deploy 
+    // Deploy OSS DAO
     const OSSDAO = await ethers.getContractFactory("OSSDAO");
     const daoResult = await deployContractRobust(OSSDAO, [tokenResult.address], "OSS DAO");
     deploymentResults.dao = daoResult;
 
     // Setup permissions
-    console.log("\n🔧 Setting up permissions...");
-    
-    // Add OSS Rewards as a minter for the token
-    console.log("📝 Adding OSS Rewards as token minter...");
+    console.log("\n🔧 Configuring permissions...");
+
+    console.log("   ➕ Granting minter role → OSS Rewards");
     const addMinterTx = await tokenResult.contract.addMinter(rewardsResult.address);
-    console.log(`📝 Add minter transaction sent: ${addMinterTx.hash}`);
-    const addMinterReceipt = await waitForTransactionWithRetries(deployer.provider, addMinterTx.hash);
-    console.log("✅ Added OSS Rewards as token minter");
+    console.log(`   ↳ Tx Hash : ${addMinterTx.hash}`);
+    await waitForTransactionWithRetries(deployer.provider, addMinterTx.hash);
+    console.log("   ✅ Minter role granted");
 
-    // Transfer some tokens to the DAO for governance
-    console.log("📝 Transferring tokens to DAO treasury...");
-    const transferAmount = ethers.parseEther("1000000"); // 1M tokens
+    console.log("   💸 Transferring 1M tokens → DAO Treasury");
+    const transferAmount = ethers.parseEther("1000000");
     const transferTx = await tokenResult.contract.transfer(daoResult.address, transferAmount);
-    console.log(`📝 Transfer transaction sent: ${transferTx.hash}`);
-    const transferReceipt = await waitForTransactionWithRetries(deployer.provider, transferTx.hash);
-    console.log("✅ Transferred 1M tokens to DAO treasury");
+    console.log(`   ↳ Tx Hash : ${transferTx.hash}`);
+    await waitForTransactionWithRetries(deployer.provider, transferTx.hash);
+    console.log("   ✅ Transfer complete");
 
-    // Create deployment info
+    // Save deployment info
     const deploymentInfo = {
       network: network.name,
       chainId: network.config.chainId,
@@ -115,25 +112,24 @@ async function main() {
         tokenDeploy: tokenResult.receipt.hash,
         rewardsDeploy: rewardsResult.receipt.hash,
         daoDeploy: daoResult.receipt.hash,
-        addMinter: addMinterReceipt.hash,
-        transferToDAO: transferReceipt.hash
+        addMinter: addMinterTx.hash,
+        transferToDAO: transferTx.hash
       }
     };
 
-    // Save deployment info
     const deploymentsDir = path.join(__dirname, "..", "deployments");
     if (!fs.existsSync(deploymentsDir)) {
       fs.mkdirSync(deploymentsDir, { recursive: true });
     }
-    
+
     const deploymentFile = path.join(deploymentsDir, `${network.name}.json`);
     fs.writeFileSync(deploymentFile, JSON.stringify(deploymentInfo, null, 2));
-    console.log("📄 Deployment info saved to:", deploymentFile);
+    console.log("📄 Deployment info saved →", deploymentFile);
 
     // Update frontend config
     const frontendConfigPath = path.join(__dirname, "..", "src", "utils", "contracts.js");
-    const frontendConfig = `// Auto-generated contract addresses - DO NOT EDIT MANUALLY
-// This file is updated by the deployment script
+    const frontendConfig = `// Auto-generated contract addresses - DO NOT EDIT
+// Updated by deployment script
 
 export const CONTRACT_ADDRESSES = {
   TOKEN: "${tokenResult.address}",
@@ -153,37 +149,37 @@ export const DEPLOYMENT_INFO = {
   },
 };
 `;
-
     fs.writeFileSync(frontendConfigPath, frontendConfig);
-    console.log("🎨 Frontend config updated:", frontendConfigPath);
+    console.log("🎨 Frontend config updated →", frontendConfigPath);
 
-    console.log("\n🎉 Deployment completed successfully!");
-    console.log("\n📋 Summary:");
-    console.log("═══════════════════════════════════");
-    console.log("🪙 OSS Token:", tokenResult.address);
-    console.log("🎁 OSS Rewards:", rewardsResult.address);
-    console.log("🏛️  Dao:", daoResult.address);
-    console.log("═══════════════════════════════════");
-    
-    if (network.name === "holesky" || network.name === "holesky2" || network.name === "holesky3") {
+    // Summary
+    console.log("\n📋 Deployment Summary");
+    console.log("─────────────────────────────");
+    console.log(`🪙 Token   : ${tokenResult.address}`);
+    console.log(`🎁 Rewards : ${rewardsResult.address}`);
+    console.log(`🏛️ DAO     : ${daoResult.address}`);
+    console.log("─────────────────────────────");
+
+    if (["holesky", "holesky2", "holesky3"].includes(network.name)) {
       console.log("\n🔍 Verify contracts on Etherscan:");
-      console.log(`npx hardhat verify --network ${network.name} ${tokenResult.address}`);
-      console.log(`npx hardhat verify --network ${network.name} ${rewardsResult.address} ${tokenResult.address}`);
-      console.log(`npx hardhat verify --network ${network.name} ${daoResult.address} ${tokenResult.address}`);
+      console.log(`   npx hardhat verify --network ${network.name} ${tokenResult.address}`);
+      console.log(`   npx hardhat verify --network ${network.name} ${rewardsResult.address} ${tokenResult.address}`);
+      console.log(`   npx hardhat verify --network ${network.name} ${daoResult.address} ${tokenResult.address}`);
     }
 
-    console.log("\n💡 Next steps:");
-    console.log("1. ✅ Frontend automatically updated with contract addresses");
-    console.log("2. 🌐 Start your React app: npm start");
-    console.log("3. 🔗 Connect your MetaMask to Holesky testnet");
-    console.log("4. 🎯 Test the full platform functionality");
+    console.log("\n💡 Next Steps:");
+    console.log("   1️⃣ Frontend already updated");
+    console.log("   2️⃣ Start app → npm start");
+    console.log("   3️⃣ Connect MetaMask → Holesky testnet");
+    console.log("   4️⃣ Test the full platform 🎯");
+
+    console.log("\n✅ Deployment completed successfully!");
 
   } catch (error) {
-    console.error("❌ Deployment failed:", error.message);
-    
-    // Save partial deployment info if any contracts were deployed
+    console.error(`\n❌ Deployment Error: ${error.message}`);
+
     if (Object.keys(deploymentResults).length > 0) {
-      console.log("\n📄 Saving partial deployment info...");
+      console.log("💾 Saving partial deployment info...");
       const partialInfo = {
         network: network.name,
         deployer: deployer.address,
@@ -192,17 +188,17 @@ export const DEPLOYMENT_INFO = {
         deployedContracts: deploymentResults,
         error: error.message
       };
-      
+
       const deploymentsDir = path.join(__dirname, "..", "deployments");
       if (!fs.existsSync(deploymentsDir)) {
         fs.mkdirSync(deploymentsDir, { recursive: true });
       }
-      
+
       const partialFile = path.join(deploymentsDir, `${network.name}-partial.json`);
       fs.writeFileSync(partialFile, JSON.stringify(partialInfo, null, 2));
-      console.log("📄 Partial deployment saved to:", partialFile);
+      console.log("📄 Partial deployment saved →", partialFile);
     }
-    
+
     process.exit(1);
   }
 }
@@ -210,6 +206,6 @@ export const DEPLOYMENT_INFO = {
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error("❌ Deployment script failed:", error);
+    console.error("❌ Script failed:", error);
     process.exit(1);
-  }); 
+  });
